@@ -52,7 +52,7 @@ int openBitOut(FILE *stream)
 	if(!outOpen)
 	{
 		outStream = stream;
-		inOpen = 1;
+		outOpen = 1;
 		outBitIndex = 0;
 		outBuffer = 0;
 		return 1;
@@ -67,6 +67,7 @@ int closeBitOut()
 	{
 		outBuffer = outBuffer << 7-outBitIndex;
 		putc(outBuffer, outStream);
+		outStream = NULL;
 		outBuffer = 0;
 		outBitIndex = NULL;
 		outOpen = 0;
