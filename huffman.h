@@ -11,4 +11,3 @@ struct Node
 
 int countLetters(FILE *stream, struct Node **letters);
 
-int quickSort(struct Node **freqs, int start, int stop);
