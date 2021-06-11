@@ -39,6 +39,10 @@ int countLetters(FILE *stream, struct Node **letters)
 }
 
 
+int compareNodes(const void *a, const void *b)
+{
+	return ((*(struct Node**)b)->freq)-((*(struct Node**)a)->freq);
+}
 
 struct Node *generateTree(struct Node **freqs)
 {
@@ -48,32 +52,10 @@ struct Node *generateTree(struct Node **freqs)
 	for(int i = 0; i<128; i++)
 		leaves[i] = freqs[i];
 
-	quickSort(leaves, 0, 127);
+
+	qsort(leaves, 128, sizeof(struct Node*), compareNodes);
+	
+	return leaves[0];//UNFINISHED
 }
 
-int quickSort(struct Node **nodes, int start, int stop)
-{
-	int i = start;
-	int j = stop;
-	int med = (stop-start)/2;
 
-	while(i <= j)
-	{
-		while(nodes[i]->freq < nodes[med]->freq)
-			i++;
-		while(nodes[j]->freq > nodes[med]->freq)
-			j--;
-
-		if(i < j)
-		{
-			struct Node *temp = nodes[i];
-			nodes[i] = nodes[j];
-			nodes[j] = temp;
-		}
-	}
-
-	quickSort(nodes, start, i-1);
-	quickSort(nodes, i, stop);
-
-	return 1;
-}
