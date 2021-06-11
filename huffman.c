@@ -19,7 +19,6 @@ struct Node
 	struct Node *right;
 };
 
-
 //counts letters in given stream and returns an array of pointers to corresponding nodes with each frequency
 int countLetters(FILE *stream, struct Node **letters)
 {
@@ -31,14 +30,10 @@ int countLetters(FILE *stream, struct Node **letters)
 		letters[i]->val = i;
 	}
 
-	printf("created all letter nodes\n");
-
-	do	
-	{
-		char letter = fgetc(stream);
-		printf("%d", letter);
+	int eof = 0;
+	int letter;
+	while((letter = getc(stream))!= EOF)	
 		letters[letter]->freq++;
-	} while(!feof(stream));
 
 	return 1;
 }
