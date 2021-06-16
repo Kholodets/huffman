@@ -55,7 +55,44 @@ struct Node *generateTree(struct Node **freqs)
 
 	qsort(leaves, 128, sizeof(struct Node*), compareNodes);
 	
-	return leaves[0];//UNFINISHED
+	int last = 0; //defines where in the array the last pointer is
+
+	for(int i = 0; i < 128; i++)
+	{
+		if(leaves[i]->freq == 0)
+			leaves[i] = NULL;
+		else
+			last = i;
+	}
+
+	while(last > 0)
+	{
+		//get two smallest nodes in array
+		struct Node *left = leaves[last];
+		struct Node *right = leaves[last-1];
+
+		//create parent node for them with a freq as the sum of the two
+		struct Node *par = malloc(sizeof(struct Node));
+		
+		par->left = left;
+		par->right = right;
+		par->freq = left->freq + right->freq;
+		par->isLeaf = 0;
+
+		leaves[last] = NULL;
+		leaves[last-1] = par;
+
+		last -= 1;
+
+		for(int i = last; i--; par->freq > leaves[i-1]->freq && i > 0) //insert new parent node into array so it remains in order
+		{
+			struct Node *temp = leaves[i-1];
+			leaves[i-1] = par;
+			leaves[i] = temp;
+		}
+	}
+
+	return leaves[0];
 }
 
 
