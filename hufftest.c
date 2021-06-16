@@ -11,5 +11,8 @@ int main()
 		if(counts[i]->freq > 0 && counts[i]->val > 31)
 		printf("%c: %d\n", counts[i]->val, counts[i]->freq);
 	}
+
+	struct Node *tree = generateTree(counts);
+	printf("tree generated, total freq = %d\n", tree->freq);
 	return 1;
 }

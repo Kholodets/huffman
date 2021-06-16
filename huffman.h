@@ -11,3 +11,4 @@ struct Node
 
 int countLetters(FILE *stream, struct Node **letters);
 
+struct Node* generateTree(struct Node **freqs);

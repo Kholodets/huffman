@@ -64,7 +64,7 @@ struct Node *generateTree(struct Node **freqs)
 		else
 			last = i;
 	}
-
+	
 	while(last > 0)
 	{
 		//get two smallest nodes in array
@@ -76,20 +76,28 @@ struct Node *generateTree(struct Node **freqs)
 		
 		par->left = left;
 		par->right = right;
-		par->freq = left->freq + right->freq;
+		par->freq = (left->freq) + (right->freq);
+		//printf("%d\n", par->freq);
 		par->isLeaf = 0;
+
+		right->parent = par;
+		left->parent = par;
 
 		leaves[last] = NULL;
 		leaves[last-1] = par;
 
 		last -= 1;
 
-		for(int i = last; i--; par->freq > leaves[i-1]->freq && i > 0) //insert new parent node into array so it remains in order
+		int i = last-1;
+
+		while(i >= 0 && par->freq > leaves[i]->freq) //insert new parent node into array so it remains in order
 		{
-			struct Node *temp = leaves[i-1];
-			leaves[i-1] = par;
-			leaves[i] = temp;
+			struct Node *temp = leaves[i];
+			leaves[i] = par;
+			leaves[i+1] = temp;
+			i--;
 		}
+
 	}
 
 	return leaves[0];
