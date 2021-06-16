@@ -11,7 +11,8 @@ void main()
 		printf("%d", val);
 	} while(val != 2);
 	printf("\n");
-	openBitOut(stdout);
+	closeBitIn();
+	/*openBitOut(stdout);
 	int bits[22] = {0,1,1,0,0,0,0,1, 0,1,1,1,0,0,1,1, 0,0,1,1,0,1};
 	for(int i = 0; i < 22; i++)
 	{
@@ -19,5 +20,5 @@ void main()
 	}
 
 	closeBitOut();
-	printf("\n");
+	printf("\n");*/
 }

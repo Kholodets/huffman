@@ -103,4 +103,26 @@ struct Node *generateTree(struct Node **freqs)
 	return leaves[0];
 }
 
+//you MUST have opened a bitio out stream before using this
+int encodeTree(struct Node *head)
+{
+	//this will just be recursive because why not
+	if(head->isLeaf)
+	{
+		writeBit(1);
+
+		for(int i = 0; i < 8; i++)
+		{
+			writeBit(((head->val << i)&128)>>7);
+		}
+
+	} else {
+		writeBit(0);
+		encodeTree(head->left);
+		encodeTree(head->right);
+	}
+
+	return 1;
+}
+
 
