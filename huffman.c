@@ -125,4 +125,27 @@ int encodeTree(struct Node *head)
 	return 1;
 }
 
+struct Node *decodeTree()
+{
+	struct Node *me = malloc(sizeof(struct Node));
+	me->isLeaf = readBit();
+
+	if(me->isLeaf)
+	{
+		char v = 0;
+		for(int i = 0; i < 8; i++)
+		{
+			v = v << 1;
+			v += readBit();
+		}
+
+		me->val = v;
+	} else {
+		me->left = decodeTree();
+		me->right = decodeTree();
+	}
+
+	return me;
+}
+
 
