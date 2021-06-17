@@ -26,7 +26,9 @@ int main()
 {
 	openBitIn(stdin);
 	struct Node *tree = decodeTree();
-	printf("tree decoded\n");
-	printTree(tree, 0);
+	//printf("tree decoded\n");
+	//printTree(tree, 0);
+	//printf("\n--------------------------------\ndecoding text:\n");
+	decodeText(stdout, tree);
 	return 1;
 }

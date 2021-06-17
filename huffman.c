@@ -12,7 +12,7 @@ struct Node
 {
 	int freq;
 	int isLeaf;
-	char val;
+	unsigned char val;
 
 	struct Node *parent;
 	struct Node *left;
@@ -22,18 +22,19 @@ struct Node
 //counts letters in given stream and returns an array of pointers to corresponding nodes with each frequency
 int countLetters(FILE *stream, struct Node **letters)
 {
-	for(char i = 0; i < 128; i++)
+	for(int i = 0; i < 256; i++)
 	{
 		letters[i] = malloc(sizeof(struct Node));
 		letters[i]->freq = 0;
 		letters[i]->isLeaf = 1;
 		letters[i]->val = i;
 	}
-
-	int eof = 0;
-	int letter;
-	while((letter = getc(stream))!= EOF)	
+	unsigned char letter;
+	while(letter != EOF && letter != 255)
+	{	
+		letter = getc(stream);
 		letters[letter]->freq++;
+	}
 
 	return 1;
 }
@@ -46,18 +47,18 @@ int compareNodes(const void *a, const void *b)
 
 struct Node *generateTree(struct Node **freqs)
 {
-	struct Node *leaves[128];
+	struct Node *leaves[256];
 
 	//copy frequencies into leaves
-	for(int i = 0; i<128; i++)
+	for(int i = 0; i<256; i++)
 		leaves[i] = freqs[i];
 
 
-	qsort(leaves, 128, sizeof(struct Node*), compareNodes);
+	qsort(leaves, 256, sizeof(struct Node*), compareNodes);
 	
 	int last = 0; //defines where in the array the last pointer is
 
-	for(int i = 0; i < 128; i++)
+	for(int i = 0; i < 256; i++)
 	{
 		if(leaves[i]->freq == 0)
 			leaves[i] = NULL;
@@ -132,7 +133,7 @@ struct Node *decodeTree()
 
 	if(me->isLeaf)
 	{
-		char v = 0;
+		unsigned char v = 0;
 		for(int i = 0; i < 8; i++)
 		{
 			v = v << 1;
@@ -148,4 +149,55 @@ struct Node *decodeTree()
 	return me;
 }
 
+int encodeText(FILE *stream, struct Node **freqs)
+{
+	unsigned char letter;
+	while(letter != EOF && letter != 255)
+	{
+		letter = getc(stream);
+		int steps[16];
+		int count = 0;
+		struct Node *current = freqs[letter];
+		//printf("encoding %d, steps:\n", letter);
+		while(current->parent)
+		{
+			int lr = current->parent->right == current; //0 = left, 1 = right
+			steps[count] = lr;
+			current = current->parent;
+			count++;
+		}
 
+	 	for(int i = count-1; i >= 0; i--)
+		{
+			//printf("%d, ", steps[i]);
+			writeBit(steps[i]);
+		}
+
+		//printf("\n");
+
+	}
+
+	return 1;
+}
+
+int decodeText(FILE *stream, struct Node *tree)
+{
+	struct Node *current = tree;
+	int bit;
+	while((bit = readBit()) != 2)
+	{
+		current = bit ? current->right : current->left;
+		
+		if(current->isLeaf)
+		{
+			if(current->val == EOF || current->val == 255)
+			{
+				//perror("reached last encoded char\n");
+				return 1;
+			}
+			putc(current->val, stream);
+			current = tree;
+		}
+	}
+	putc(3, stream);
+}

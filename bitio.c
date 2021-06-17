@@ -13,8 +13,8 @@ int inOpen = 0;
 int outOpen = 0;
 FILE *inStream;
 FILE *outStream;
-char inBuffer;
-char outBuffer;
+unsigned char inBuffer;
+unsigned char outBuffer;
 
 int openBitIn(FILE *stream)
 {
@@ -87,8 +87,9 @@ int readBit()
 		{
 			inBitIndex = 0;
 			if(feof(inStream))
-				closeBitIn(); //premptively closes when reached end of stream so will return 2 on next call
-			else
+			{	
+				closeBitIn();
+			} else
 				inBuffer = getc(inStream);
 		}
 		return value;

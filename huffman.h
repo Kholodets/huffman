@@ -2,7 +2,7 @@ struct Node
 {
 	int freq;
 	int isLeaf;
-	char val;
+	unsigned char val;
 
 	struct Node *parent;
 	struct Node *left;
@@ -16,3 +16,7 @@ struct Node* generateTree(struct Node **freqs);
 int encodeTree(struct Node *head);
 
 struct Node *decodeTree();
+
+int encodeText(FILE *stream, struct Node **freqs);
+
+int decodeText(FILE *stream, struct Node *tree);
