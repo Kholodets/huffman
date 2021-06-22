@@ -5,16 +5,16 @@
 void printTree(struct Node *head, int level)
 {
         for(int i = 0; i < level; i++)
-                printf("\t");
+                fprintf(stderr, "\t");
         if(head->isLeaf)
-                printf("leaf, val = %d\n", head->val);
+                fprintf(stderr, "leaf, val = %d\n", head->val);
         else
         {
-        	printf("branch: left:\n");
+        	fprintf(stderr, "branch: left:\n");
                 printTree(head->left, level+1);
                 for(int i = 0; i < level; i++)
-                	printf("\t");
-        	printf("right:\n");
+                	fprintf(stderr, "\t");
+        	fprintf(stderr, "right:\n");
                 printTree(head->right, level+1);
         }
 }
@@ -23,9 +23,9 @@ int main()
 {
 	struct Node *counts[256];
 	FILE *input = fopen("./in.txt", "r");
-	//printf("starting count\n");
+	//perror("starting count\n");
 	countLetters(input, counts);
-	//printf("got counts\n");
+	//perror("got counts\n");
 	/*for(char i = 0; i < 128; i++)
 	{
 		if(counts[i]->freq > 0 && counts[i]->val > 31)
@@ -34,14 +34,15 @@ int main()
 	*/
 	struct Node *tree = generateTree(counts);
 	//printTree(tree, 0);
-	//printf("tree generated, total freq = %d\n", tree->freq);
+	//perror("tree generated\n");
 	/*printf("left child freq = %d\n", tree->left->freq);
 	printf("right child freq = %d\n", tree->right->freq);*/
 	openBitOut(stdout);
 	encodeTree(tree);
-	//printf("encoded tree\n");
+	//perror("encoded tree\n");
 	rewind(input);
-	//printf("rewound input\n");
+	//perror("rewound input\n");
+	//fprintf(stderr, "%c%c%c%c\n", getc(input), getc(input), getc(input), getc(input));
 	encodeText(input, counts);
 	closeBitOut();
 	freeFreqs(counts);

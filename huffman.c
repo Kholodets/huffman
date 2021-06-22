@@ -28,6 +28,7 @@ int countLetters(FILE *stream, struct Node **letters)
 		letters[i]->freq = 0;
 		letters[i]->isLeaf = 1;
 		letters[i]->val = i;
+		letters[i]->parent = NULL;
 	}
 	unsigned char letter;
 	while(letter != EOF && letter != 255)
@@ -155,10 +156,9 @@ int encodeText(FILE *stream, struct Node **freqs)
 	while(letter != EOF && letter != 255)
 	{
 		letter = getc(stream);
-		int steps[16];
+		int steps[24];
 		int count = 0;
 		struct Node *current = freqs[letter];
-		//printf("encoding %d, steps:\n", letter);
 		while(current->parent)
 		{
 			int lr = current->parent->right == current; //0 = left, 1 = right
@@ -167,13 +167,12 @@ int encodeText(FILE *stream, struct Node **freqs)
 			count++;
 		}
 
-	 	for(int i = count-1; i >= 0; i--)
+
+	 	for(int i = count; i > 0; i--)
 		{
-			//printf("%d, ", steps[i]);
-			writeBit(steps[i]);
+			writeBit(steps[i-1]);
 		}
 
-		//printf("\n");
 
 	}
 
