@@ -201,3 +201,29 @@ int decodeText(FILE *stream, struct Node *tree)
 	}
 	putc(3, stream);
 }
+
+
+//only frees the empty characters as they are not part of the tree, you must also free the tree
+int freeFreqs(struct Node **freqs)
+{
+	for(int i = 0; i < 256; i++)
+	{
+		if(freqs[i]->freq == 0)
+			free(freqs[i]);
+	}
+
+	return 1;
+}
+
+int freeTree(struct Node *tree)
+{
+	if(!tree->isLeaf)
+	{
+		freeTree(tree->left);
+		freeTree(tree->right);
+	}
+
+	free(tree);
+
+	return 1;
+}

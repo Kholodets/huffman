@@ -30,5 +30,7 @@ int main()
 	//printTree(tree, 0);
 	//printf("\n--------------------------------\ndecoding text:\n");
 	decodeText(stdout, tree);
+	closeBitIn();
+	freeTree(tree);
 	return 1;
 }

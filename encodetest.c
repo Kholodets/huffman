@@ -44,5 +44,7 @@ int main()
 	//printf("rewound input\n");
 	encodeText(input, counts);
 	closeBitOut();
+	freeFreqs(counts);
+	freeTree(tree);
 	return 1;
 }

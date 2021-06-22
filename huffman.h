@@ -20,3 +20,7 @@ struct Node *decodeTree();
 int encodeText(FILE *stream, struct Node **freqs);
 
 int decodeText(FILE *stream, struct Node *tree);
+
+int freeFreqs(struct Node **freqs);
+
+int freeTree(struct Node *tree);
