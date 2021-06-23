@@ -40,7 +40,7 @@ int closeBitIn()
 	{
 		inStream = NULL;
 		inOpen = 0;
-		inBitIndex = NULL;
+		inBitIndex = 0;
 		return 1;
 	}
 
@@ -65,11 +65,11 @@ int closeBitOut()
 {
 	if(outOpen)
 	{
-		outBuffer = outBuffer << 7-outBitIndex;
+		outBuffer = outBuffer << (7-outBitIndex);
 		putc(outBuffer, outStream);
 		outStream = NULL;
 		outBuffer = 0;
-		outBitIndex = NULL;
+		outBitIndex = 0;
 		outOpen = 0;
 		return 1;
 	}

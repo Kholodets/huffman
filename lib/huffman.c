@@ -198,7 +198,8 @@ int decodeText(FILE *stream, struct Node *tree)
 			current = tree;
 		}
 	}
-	putc(3, stream);
+	
+	return 1;
 }
 
 
