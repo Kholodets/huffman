@@ -19,7 +19,7 @@ struct Node
 	struct Node *right;
 };
 
-//counts letters in given stream and returns an array of pointers to corresponding nodes with each frequency
+//counts letters in given stream and fills provided array of pointers with corresponding nodes with each frequency
 int countLetters(FILE *stream, struct Node **letters)
 {
 	for(int i = 0; i < 256; i++)
@@ -37,10 +37,10 @@ int countLetters(FILE *stream, struct Node **letters)
 		letters[letter]->freq++;
 	}
 
-	return 1;
+	return 0;
 }
 
-
+//frequency compare function for use in stdlib provided quick sort
 int compareNodes(const void *a, const void *b)
 {
 	return ((*(struct Node**)b)->freq)-((*(struct Node**)a)->freq);
@@ -59,6 +59,7 @@ struct Node *generateTree(struct Node **freqs)
 	
 	int last = 0; //defines where in the array the last pointer is
 
+	//trims unused characters so they dont end up in the tree
 	for(int i = 0; i < 256; i++)
 	{
 		if(leaves[i]->freq == 0)
@@ -79,7 +80,6 @@ struct Node *generateTree(struct Node **freqs)
 		par->left = left;
 		par->right = right;
 		par->freq = (left->freq) + (right->freq);
-		//printf("%d\n", par->freq);
 		par->isLeaf = 0;
 
 		right->parent = par;
@@ -92,7 +92,8 @@ struct Node *generateTree(struct Node **freqs)
 
 		int i = last-1;
 
-		while(i >= 0 && par->freq > leaves[i]->freq) //insert new parent node into array so it remains in order
+		//insert new parent node into array so it remains in order
+		while(i >= 0 && par->freq > leaves[i]->freq)
 		{
 			struct Node *temp = leaves[i];
 			leaves[i] = par;
@@ -106,9 +107,9 @@ struct Node *generateTree(struct Node **freqs)
 }
 
 //you MUST have opened a bitio out stream before using this
+//recursively prints the tree to the output, 0 designates a branch node, 1 designates a leaf, followed by its character
 int encodeTree(struct Node *head)
 {
-	//this will just be recursive because why not
 	if(head->isLeaf)
 	{
 		writeBit(1);
@@ -124,9 +125,10 @@ int encodeTree(struct Node *head)
 		encodeTree(head->right);
 	}
 
-	return 1;
+	return 0;
 }
 
+//recursively reads the huffman tree from the beginning of the input and returns the generated structure
 struct Node *decodeTree()
 {
 	struct Node *me = malloc(sizeof(struct Node));
@@ -150,6 +152,7 @@ struct Node *decodeTree()
 	return me;
 }
 
+//reads text from provided input stream and prints encoded text to bit out using provided huff tree
 int encodeText(FILE *stream, struct Node **freqs)
 {
 	unsigned char letter;
@@ -159,6 +162,8 @@ int encodeText(FILE *stream, struct Node **freqs)
 		int steps[24];
 		int count = 0;
 		struct Node *current = freqs[letter];
+
+		//traverses up the tree, recording the steps taken
 		while(current->parent)
 		{
 			int lr = current->parent->right == current; //0 = left, 1 = right
@@ -166,7 +171,6 @@ int encodeText(FILE *stream, struct Node **freqs)
 			current = current->parent;
 			count++;
 		}
-
 
 	 	for(int i = count; i > 0; i--)
 		{
@@ -176,9 +180,10 @@ int encodeText(FILE *stream, struct Node **freqs)
 
 	}
 
-	return 1;
+	return 0;
 }
 
+//reads encoded text from bit input using provided huff tree and 
 int decodeText(FILE *stream, struct Node *tree)
 {
 	struct Node *current = tree;
@@ -190,16 +195,16 @@ int decodeText(FILE *stream, struct Node *tree)
 		if(current->isLeaf)
 		{
 			if(current->val == EOF || current->val == 255)
-			{
-				//perror("reached last encoded char\n");
-				return 1;
-			}
+				return 0;
+
 			putc(current->val, stream);
 			current = tree;
 		}
 	}
 	
-	return 1;
+	return 0; 
+
+	//this function could do with a bit of cleaning up, as its main while loop condition will never be false under normal conditions, and relies on the other EOF check in the loop to terminate
 }
 
 

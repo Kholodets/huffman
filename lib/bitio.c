@@ -86,10 +86,9 @@ int readBit()
 		if(inBitIndex == 8)
 		{
 			inBitIndex = 0;
-			if(feof(inStream))
-			{	
+			if(feof(inStream))	
 				closeBitIn();
-			} else
+			else
 				inBuffer = getc(inStream);
 		}
 		return value;
