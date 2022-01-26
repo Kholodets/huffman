@@ -1,11 +1,18 @@
-int openBitIn(FILE *stream);
+struct BitIO
+{
+	FILE *stream;
+	int i;
+	unsigned char buffer;
+};
 
-int closeBitIn();
+struct BitIO *openBitIn(FILE *stream);
 
-int openBitOut(FILE *stream);
+int closeBitIn(struct BitIO *io);
 
-int closeBitOut();
+struct BitIO *openBitOut(FILE *stream);
 
-int readBit();
+int closeBitOut(struct BitIO *io);
 
-int writeBit(int value);
+int readBit(struct BitIO *io);
+
+int writeBit(int value, struct BitIO *io);

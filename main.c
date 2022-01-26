@@ -78,18 +78,20 @@ int main(int argc, char *argv[])
 
 		struct Node *tree = generateTree(counts);
 
-		openBitOut(output);
+		struct BitIO *bitsOut = openBitOut(output);
 
-		encodeTree(tree);
+		encodeTree(tree, bitsOut);
 
 		rewind(input);
 
-		encodeText(input, counts);
+		encodeText(input, counts, bitsOut);
 
-		closeBitOut();
+		closeBitOut(bitsOut);
 
 		freeFreqs(counts);
 		freeTree(tree);
+		free(bitsOut);
+
 		fclose(input);
 		fclose(output);
 
@@ -101,14 +103,15 @@ int main(int argc, char *argv[])
 	{
 		fprintf(stderr, "Decoding file...");
 
-		openBitIn(input);
-		struct Node *tree = decodeTree();
+		struct BitIO *bitsIn= openBitIn(input);
+		struct Node *tree = decodeTree(bitsIn);
 
-		decodeText(output, tree);
 
-		closeBitIn();
+		decodeText(output, tree, bitsIn);
+
+		closeBitIn(bitsIn);
 		freeTree(tree);
-
+		free(bitsIn);
 		fclose(input);
 		fclose(output);
 

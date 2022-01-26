@@ -6,90 +6,71 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 
-int inBitIndex;
-int outBitIndex;
-int inOpen = 0;
-int outOpen = 0;
-FILE *inStream;
-FILE *outStream;
-unsigned char inBuffer;
-unsigned char outBuffer;
-
-int openBitIn(FILE *stream)
+struct BitIO 
 {
-	if(!inOpen)
-	{
-		inStream = stream;
-		inOpen = 1;
-		inBitIndex = 0;
-		if(!feof(inStream))
-		{
-			inBuffer = getc(inStream);
-			return 1;
-		}
-	}
+	FILE *stream;
+	int i;
+	unsigned char buffer;
+	int open;
+};
 
-	return 0;
+struct BitIO *openBitIn(FILE *stream)
+{
+	struct BitIO *io = malloc(sizeof(struct BitIO));
+	io->stream = stream;
+	io->i = 0;
+	io->open = 1;
+	if(!feof(stream))
+	{
+		io->buffer = getc(stream);
+		return io;
+	}
+	
+
+	return NULL;
 }
 
 //Note: This will dump the rest of the byte currently being read
-int closeBitIn()
+int closeBitIn(struct BitIO *io)
 {
-	if(inOpen)
-	{
-		inStream = NULL;
-		inOpen = 0;
-		inBitIndex = 0;
-		return 1;
-	}
-
+	io->open = 0;
 	return 0;
 }
 
-int openBitOut(FILE *stream)
+struct BitIO *openBitOut(FILE *stream)
 {
-	if(!outOpen)
-	{
-		outStream = stream;
-		outOpen = 1;
-		outBitIndex = 0;
-		outBuffer = 0;
-		return 1;
-	}
+	struct BitIO *io = malloc(sizeof(struct BitIO));
+	io->stream = stream;
+	io->i = 0;
+	io->open = 1;
+	return io;
+}
 
+int closeBitOut(struct BitIO *io)
+{
+	io->buffer = (io->buffer) << (7-(io->i));
+	putc(io->buffer, io->stream);
+	io->buffer = 0;
+	io->i = 0;
+	io->open = 0;
 	return 0;
 }
 
-int closeBitOut()
+int readBit(struct BitIO *io)
 {
-	if(outOpen)
+	if(io->open)
 	{
-		outBuffer = outBuffer << (7-outBitIndex);
-		putc(outBuffer, outStream);
-		outStream = NULL;
-		outBuffer = 0;
-		outBitIndex = 0;
-		outOpen = 0;
-		return 1;
-	}
-
-	return 0;
-}
-
-int readBit()
-{
-	if(inOpen)
-	{
-		int value = ((inBuffer << inBitIndex)&128)>>7;
-		inBitIndex++;
-		if(inBitIndex == 8)
+		int value = ((io->buffer << (io->i))&128)>>7;
+		(io->i)++;
+		if((io->i) == 8)
 		{
-			inBitIndex = 0;
-			if(feof(inStream))	
-				closeBitIn();
+			io->i = 0;
+			if(feof(io->stream))	
+				closeBitIn(io);
 			else
-				inBuffer = getc(inStream);
+				io->buffer = getc(io->stream);
 		}
 		return value;
 	}
@@ -97,19 +78,19 @@ int readBit()
 	return 2;
 }
 
-int writeBit(int value)
+int writeBit(int value, struct BitIO *io)
 {
-	outBuffer += value;
-	if(outBitIndex == 7)
+	io->buffer += value;
+	if((io->i) == 7)
 	{
-		putc(outBuffer, outStream);
-		outBitIndex = 0;
-		outBuffer = 0;
+		putc(io->buffer, io->stream);
+		io->i = 0;
+		io->buffer = 0;
 	} else
 	{
-		outBuffer = outBuffer << 1;
-		outBitIndex++;
+		io->buffer = (io->buffer) << 1;
+		(io->i)++;
 	}
 
-	return 1;//outBuffer;
+	return 0;//outBuffer;
 }

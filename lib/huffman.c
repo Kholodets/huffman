@@ -51,7 +51,7 @@ struct Node *generateTree(struct Node **freqs)
 	struct Node *leaves[256];
 
 	//copy frequencies into leaves
-	for(int i = 0; i<256; i++)
+	for(int i = 0; i<256; i++) 
 		leaves[i] = freqs[i];
 
 
@@ -108,31 +108,31 @@ struct Node *generateTree(struct Node **freqs)
 
 //you MUST have opened a bitio out stream before using this
 //recursively prints the tree to the output, 0 designates a branch node, 1 designates a leaf, followed by its character
-int encodeTree(struct Node *head)
+int encodeTree(struct Node *head, struct BitIO *bitsOut)
 {
 	if(head->isLeaf)
 	{
-		writeBit(1);
+		writeBit(1, bitsOut);
 
 		for(int i = 0; i < 8; i++)
 		{
-			writeBit(((head->val << i)&128)>>7);
+			writeBit(((head->val << i)&128)>>7, bitsOut);
 		}
 
 	} else {
-		writeBit(0);
-		encodeTree(head->left);
-		encodeTree(head->right);
+		writeBit(0, bitsOut);
+		encodeTree(head->left, bitsOut);
+		encodeTree(head->right, bitsOut);
 	}
 
 	return 0;
 }
 
 //recursively reads the huffman tree from the beginning of the input and returns the generated structure
-struct Node *decodeTree()
+struct Node *decodeTree(struct BitIO *bitsIn)
 {
 	struct Node *me = malloc(sizeof(struct Node));
-	me->isLeaf = readBit();
+	me->isLeaf = readBit(bitsIn);
 
 	if(me->isLeaf)
 	{
@@ -140,20 +140,20 @@ struct Node *decodeTree()
 		for(int i = 0; i < 8; i++)
 		{
 			v = v << 1;
-			v += readBit();
+			v += readBit(bitsIn);
 		}
 
 		me->val = v;
 	} else {
-		me->left = decodeTree();
-		me->right = decodeTree();
+		me->left = decodeTree(bitsIn);
+		me->right = decodeTree(bitsIn);
 	}
 
 	return me;
 }
 
 //reads text from provided input stream and prints encoded text to bit out using provided huff tree
-int encodeText(FILE *stream, struct Node **freqs)
+int encodeText(FILE *stream, struct Node **freqs, struct BitIO *bitsOut)
 {
 	unsigned char letter;
 	while(letter != EOF && letter != 255)
@@ -174,7 +174,7 @@ int encodeText(FILE *stream, struct Node **freqs)
 
 	 	for(int i = count; i > 0; i--)
 		{
-			writeBit(steps[i-1]);
+			writeBit(steps[i-1], bitsOut);
 		}
 
 
@@ -184,11 +184,11 @@ int encodeText(FILE *stream, struct Node **freqs)
 }
 
 //reads encoded text from bit input using provided huff tree and 
-int decodeText(FILE *stream, struct Node *tree)
+int decodeText(FILE *stream, struct Node *tree, struct BitIO *bitsIn)
 {
 	struct Node *current = tree;
 	int bit;
-	while((bit = readBit()) != 2)
+	while((bit = readBit(bitsIn)) != 2)
 	{
 		current = bit ? current->right : current->left;
 		
@@ -211,7 +211,7 @@ int decodeText(FILE *stream, struct Node *tree)
 //only frees the empty characters as they are not part of the tree, you must also free the tree
 int freeFreqs(struct Node **freqs)
 {
-	for(int i = 0; i < 256; i++)
+	for(int i = 1; i < 256; i++)
 	{
 		if(freqs[i]->freq == 0)
 			free(freqs[i]);
