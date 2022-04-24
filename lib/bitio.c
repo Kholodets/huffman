@@ -22,8 +22,7 @@ struct BitIO *openBitIn(FILE *stream)
 	io->stream = stream;
 	io->i = 0;
 	io->open = 1;
-	if(!feof(stream))
-	{
+	if(!feof(stream)) {
 		io->buffer = getc(stream);
 		return io;
 	}
@@ -60,12 +59,10 @@ int closeBitOut(struct BitIO *io)
 
 int readBit(struct BitIO *io)
 {
-	if(io->open)
-	{
+	if(io->open) {
 		int value = ((io->buffer << (io->i))&128)>>7;
 		(io->i)++;
-		if((io->i) == 8)
-		{
+		if((io->i) == 8) {
 			io->i = 0;
 			if(feof(io->stream))	
 				closeBitIn(io);
@@ -81,16 +78,14 @@ int readBit(struct BitIO *io)
 int writeBit(int value, struct BitIO *io)
 {
 	io->buffer += value;
-	if((io->i) == 7)
-	{
+	if((io->i) == 7) {
 		putc(io->buffer, io->stream);
 		io->i = 0;
 		io->buffer = 0;
-	} else
-	{
+	} else {
 		io->buffer = (io->buffer) << 1;
 		(io->i)++;
 	}
 
-	return 0;//outBuffer;
+	return 0;
 }

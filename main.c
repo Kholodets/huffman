@@ -6,8 +6,7 @@
 
 int main(int argc, char *argv[])
 {
-	if(argc < 2)
-	{
+	if(argc < 2) {
 		fprintf(stderr, "You didn't provide any arguments!\n");
 		return 1;
 	}
@@ -21,12 +20,11 @@ int main(int argc, char *argv[])
 	char *in;
 	char *out;
 	
-	for(int i = 1; i < argc; i++)
-	{
-		if(*argv[i] == '-')
-		{
-			for(int j = 1; j < strlen(argv[i]); j++)
-			{
+	for(int i = 1; i < argc; i++) {
+		
+		if(*argv[i] == '-') {
+			for(int j = 1; j < strlen(argv[i]); j++) {
+
 				flags[flagc] = argv[i][j];
 				flagc++;
 
@@ -37,30 +35,23 @@ int main(int argc, char *argv[])
 				if(argv[i][j] == 'o')
 					outp = 1;
 			}
-		}
-		else
-		{
-			if(!outp)
-			{
+		} else {
+			if(!outp) {
 				inf = 1;
 				in = argv[i];
-			}
-			else
-			{
+			} else {
 				outf = 1;
 				out = argv[i];
 			}
 		}
 	}
 
-	if(ed == -1)
-	{
+	if(ed == -1) {
 		fprintf(stderr, "No action specified, use -e or -d to specify encode or decode\n");
 		return 1;
 	}
 
-	if(ed == 0 && !inf)
-	{
+	if(ed == 0 && !inf) {
 		fprintf(stderr, "Can not encode from stdin, please provide an input file.\n");
 		return 1;
 	}
@@ -68,8 +59,7 @@ int main(int argc, char *argv[])
 	FILE *input = inf ? fopen(in, "r") : stdin;
 	FILE *output = outf ? fopen(out, "w+") : stdout;
 
-	if(ed == 0)
-	{
+	if(ed == 0) {
 		fprintf(stderr, "Encoding file...");
 
 		struct Node *counts[256];
@@ -99,8 +89,7 @@ int main(int argc, char *argv[])
 
 	}
 
-	if(ed == 1)
-	{
+	if(ed == 1) {
 		fprintf(stderr, "Decoding file...");
 
 		struct BitIO *bitsIn= openBitIn(input);

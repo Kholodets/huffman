@@ -22,17 +22,16 @@ struct Node
 //counts letters in given stream and fills provided array of pointers with corresponding nodes with each frequency
 int countLetters(FILE *stream, struct Node **letters)
 {
-	for(int i = 0; i < 256; i++)
-	{
+	for(int i = 0; i < 256; i++) {
 		letters[i] = malloc(sizeof(struct Node));
 		letters[i]->freq = 0;
 		letters[i]->isLeaf = 1;
 		letters[i]->val = i;
 		letters[i]->parent = NULL;
 	}
+
 	unsigned char letter;
-	while(letter != EOF && letter != 255)
-	{	
+	while(letter != EOF && letter != 255) {	
 		letter = getc(stream);
 		letters[letter]->freq++;
 	}
@@ -60,16 +59,14 @@ struct Node *generateTree(struct Node **freqs)
 	int last = 0; //defines where in the array the last pointer is
 
 	//trims unused characters so they dont end up in the tree
-	for(int i = 0; i < 256; i++)
-	{
+	for(int i = 0; i < 256; i++) {
 		if(leaves[i]->freq == 0)
 			leaves[i] = NULL;
 		else
 			last = i;
 	}
 	
-	while(last > 0)
-	{
+	while(last > 0) {
 		//get two smallest nodes in array
 		struct Node *left = leaves[last];
 		struct Node *right = leaves[last-1];
@@ -93,8 +90,7 @@ struct Node *generateTree(struct Node **freqs)
 		int i = last-1;
 
 		//insert new parent node into array so it remains in order
-		while(i >= 0 && par->freq > leaves[i]->freq)
-		{
+		while(i >= 0 && par->freq > leaves[i]->freq) {
 			struct Node *temp = leaves[i];
 			leaves[i] = par;
 			leaves[i+1] = temp;
@@ -110,12 +106,10 @@ struct Node *generateTree(struct Node **freqs)
 //recursively prints the tree to the output, 0 designates a branch node, 1 designates a leaf, followed by its character
 int encodeTree(struct Node *head, struct BitIO *bitsOut)
 {
-	if(head->isLeaf)
-	{
+	if(head->isLeaf) {
 		writeBit(1, bitsOut);
 
-		for(int i = 0; i < 8; i++)
-		{
+		for(int i = 0; i < 8; i++) {
 			writeBit(((head->val << i)&128)>>7, bitsOut);
 		}
 
@@ -134,11 +128,9 @@ struct Node *decodeTree(struct BitIO *bitsIn)
 	struct Node *me = malloc(sizeof(struct Node));
 	me->isLeaf = readBit(bitsIn);
 
-	if(me->isLeaf)
-	{
+	if(me->isLeaf) {
 		unsigned char v = 0;
-		for(int i = 0; i < 8; i++)
-		{
+		for(int i = 0; i < 8; i++) {
 			v = v << 1;
 			v += readBit(bitsIn);
 		}
@@ -156,24 +148,21 @@ struct Node *decodeTree(struct BitIO *bitsIn)
 int encodeText(FILE *stream, struct Node **freqs, struct BitIO *bitsOut)
 {
 	unsigned char letter;
-	while(letter != EOF && letter != 255)
-	{
+	while(letter != EOF && letter != 255) {
 		letter = getc(stream);
 		int steps[24];
 		int count = 0;
 		struct Node *current = freqs[letter];
 
 		//traverses up the tree, recording the steps taken
-		while(current->parent)
-		{
+		while(current->parent) {
 			int lr = current->parent->right == current; //0 = left, 1 = right
 			steps[count] = lr;
 			current = current->parent;
 			count++;
 		}
 
-	 	for(int i = count; i > 0; i--)
-		{
+	 	for(int i = count; i > 0; i--) {
 			writeBit(steps[i-1], bitsOut);
 		}
 
@@ -188,12 +177,10 @@ int decodeText(FILE *stream, struct Node *tree, struct BitIO *bitsIn)
 {
 	struct Node *current = tree;
 	int bit;
-	while((bit = readBit(bitsIn)) != 2)
-	{
+	while((bit = readBit(bitsIn)) != 2) {
 		current = bit ? current->right : current->left;
 		
-		if(current->isLeaf)
-		{
+		if(current->isLeaf) {
 			if(current->val == EOF || current->val == 255)
 				return 0;
 
@@ -211,8 +198,7 @@ int decodeText(FILE *stream, struct Node *tree, struct BitIO *bitsIn)
 //only frees the empty characters as they are not part of the tree, you must also free the tree
 int freeFreqs(struct Node **freqs)
 {
-	for(int i = 1; i < 256; i++)
-	{
+	for(int i = 1; i < 256; i++) {
 		if(freqs[i]->freq == 0)
 			free(freqs[i]);
 	}
@@ -222,8 +208,7 @@ int freeFreqs(struct Node **freqs)
 
 int freeTree(struct Node *tree)
 {
-	if(!tree->isLeaf)
-	{
+	if(!tree->isLeaf) {
 		freeTree(tree->left);
 		freeTree(tree->right);
 	}
